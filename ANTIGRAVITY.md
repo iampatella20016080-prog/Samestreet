@@ -20,4 +20,6 @@
 
 ## 版本控制
 - 2026-10-24 起用 Git（在 Mac 上初始化）；`*.zip` 不進版控
+- 遠端：`iampatella20016080-prog/Samestreet`（**公開**，GitHub Pages 從 main 根目錄發佈）
+- 根目錄 `phone/index.html` 是手機頁的上線版本（網址 `/Samestreet/phone/`）；改了 `game/phone/index.html` 要複製一份到 `phone/index.html` 再 push
 - 倉庫在 iCloud Drive 裡：若出現 `* 2.*` 之類的衝突副本，先別 commit，回報再處理
