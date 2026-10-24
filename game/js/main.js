@@ -138,7 +138,10 @@ function buildCast(scene, refs) {
   scene.background = new THREE.Color(SS.PAL.skyBottom);
   scene.fog = new THREE.Fog(SS.PAL.skyBottom, 70, 260);
 
-  const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1200);
+  // 直拿手機時畫面很窄：視角跟著放寬，左右才看得到街景（橫的畫面維持 55 度）
+  const fovFor = (aspect) =>
+    aspect >= 1 ? 55 : Math.min(80, THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(27.5)) / Math.pow(aspect, 0.6))));
+  const camera = new THREE.PerspectiveCamera(fovFor(window.innerWidth / window.innerHeight), window.innerWidth / window.innerHeight, 0.1, 1200);
 
   const sun = new THREE.DirectionalLight(0xfff0d8, 0.72);
   sun.position.set(-40, 60, 25);
@@ -247,6 +250,7 @@ function buildCast(scene, refs) {
   function resize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
+    camera.fov = fovFor(camera.aspect);
     camera.updateProjectionMatrix();
     SS.post.resize();
   }

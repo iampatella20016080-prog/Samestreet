@@ -913,6 +913,7 @@ body:has(#hud.show) #hud-clock { top: calc(3vh + 96px); }
 .phone-body {
   position: relative;
   height: min(80vh, 780px);
+  height: min(80dvh, 780px);
   aspect-ratio: 9 / 18.5;
   padding: 12px;
   box-sizing: border-box;
@@ -1081,6 +1082,7 @@ body:has(#hud.show) #hud-clock { top: calc(3vh + 96px); }
 .theory {
   width: min(84vw, 1180px);
   max-height: 88vh;
+  max-height: 88dvh;
   overflow: hidden;
   padding: 4vh 4vw 3vh;
   box-sizing: border-box;
@@ -1395,6 +1397,7 @@ body:has(#presenter-timer.show) #wip { top: calc(2.4vh + 86px); }
 .menu-box {
   width: min(560px, 90vw);
   max-height: 86vh;
+  max-height: 86dvh;
   overflow: auto;
   padding: 20px 24px;
   background: var(--paper);
@@ -1496,6 +1499,12 @@ body:has(#presenter-timer.show) #wip { top: calc(2.4vh + 86px); }
   animation: next-bob 1.2s ease-in-out infinite;
 }
 #next-hint.show { display: block; }
+/* 下方有出處時往上移，不要疊在一起 */
+body:has(#cite.show) #next-hint { bottom: calc(2.4vh + 52px); }
+/* 橫的畫面有手機時，手機佔住正中間：提示改放左下角（這時搖桿收起來了） */
+@media not all and (max-aspect-ratio: 2/3) {
+  body:has(#phone.show) #next-hint { left: 2vw; bottom: 2.4vh; transform: none; animation: none; }
+}
 #next-hint::after { content: "　▶"; color: var(--yellow); }
 @keyframes next-bob { 50% { transform: translateX(-50%) translateY(-5px); } }
 .dlg-next {
@@ -1542,6 +1551,8 @@ body:has(#presenter-timer.show) #wip { top: calc(2.4vh + 86px); }
   touch-action: none;
 }
 .touch #touch-act.show { display: block; }
+/* 手機畫面、大面板、標題、選單出現時不能走，搖桿先藏起來 */
+body:has(#phone.show, #panel.show, #title-card.show, #menu.show, #hold.show) #touch-pad { visibility: hidden; }
 #touch-act.pressing { background: var(--green); color: #fff; transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
 
 /* 左上角 ☰：段落選單 */
@@ -1591,7 +1602,7 @@ body:has(#presenter-timer.show) #wip { top: calc(2.4vh + 86px); }
   #dialog.box { bottom: 4vh; }
   .dlg-text { font-size: 18px; }
   #dialog.loud .dlg-text { font-size: 26px; }
-  .phone-body { height: 92vh; aspect-ratio: 9 / 13; padding: 8px; border-radius: 28px; }
+  .phone-body { height: 92vh; height: 92dvh; aspect-ratio: 9 / 13; padding: 8px; border-radius: 28px; }
   .phone-screen { font-size: 13px; border-radius: 22px; }
   .phone-notch { top: 10px; height: 14px; }
   .ph-head { padding: 24px 12px 8px; }
@@ -1601,26 +1612,63 @@ body:has(#presenter-timer.show) #wip { top: calc(2.4vh + 86px); }
   #touch-nub { width: 50px; height: 50px; }
   #touch-act { right: 20px; bottom: 18px; width: 100px; height: 100px; font-size: 18px; }
   #touch-menu { top: 8px; left: 8px; width: 42px; height: 42px; font-size: 20px; }
+  #cite { max-width: 28vw; font-size: 12px; }
 }
 
-/* 手機直拿：請轉成橫的 */
-#rotate {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: none;
-  place-items: center;
-  background: var(--cream);
-  color: var(--ink);
-  text-align: center;
-  pointer-events: auto;
-}
-#rotate b { display: inline-block; font-size: 72px; line-height: 1; animation: turn 2.4s ease-in-out infinite; }
-#rotate p { margin: 16px 0 8px; font-weight: 900; font-size: 26px; }
-#rotate small { display: block; padding: 0 24px; color: var(--muted); font-weight: 700; font-size: 15px; }
-@keyframes turn { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(90deg); } }
-@media (pointer: coarse) and (orientation: portrait) and (max-width: 600px) {
-  #rotate { display: grid; }
+/* 手機直拿（畫面比 2:3 還窄）：橫排的東西改成上下排、寬度放滿 */
+@media (max-aspect-ratio: 2/3) {
+  #dialog { max-width: 92vw; min-width: 0; }
+  /* 置中的對話框寬度放滿（left:50% 的寫法最多只能用到半個螢幕寬）；講話時不能走，搖桿先藏起來 */
+  #dialog.box { left: 4vw; right: 4vw; max-width: none; transform: none; }
+  body:has(#dialog.show.box) #touch-pad { visibility: hidden; }
+  .dlg-text { font-size: 19px; }
+  #dialog.loud .dlg-text { font-size: 28px; }
+  #choices { width: 92vw; bottom: auto; top: 13dvh; }
+  #hint { bottom: 200px; max-width: 88vw; box-sizing: border-box; text-align: center; }
+  #cite { left: 4vw; right: 4vw; bottom: 1.5dvh; max-width: none; }
+  #hud { right: 2vw; gap: 4px; }
+  .hud-btn { min-width: 46px; min-height: 46px; padding: 3px 5px; }
+  .hud-count { min-width: 88px; }
+  .hud-count .row { gap: 6px; font-size: 12px; }
+  .hud-card span, .hud-ledger span { font-size: 11px; }
+  body:has(#hud.show) #hud-clock { top: calc(3vh + 72px); padding: 6px 12px; }
+  #chores-hud { top: calc(3vh + 120px); width: 86vw; box-sizing: border-box; padding: 6px 12px 8px; }
+  body:has(#hud.show) #chores-hud { top: calc(3vh + 122px); }
+  #phone.side { justify-content: center; padding-right: 0; }
+  #hold { width: 92vw; }
+  .phone-body { height: min(70dvh, 780px); }
+  body:has(#cite.show) #next-hint { bottom: calc(1.5dvh + 60px); }
+  /* 大面板：放滿寬度，太長就捲動 */
+  #panel.show { overflow-y: auto; align-items: safe center; padding: 64px 0 80px; box-sizing: border-box; }
+  .theory { width: 92vw; max-height: none; padding: 3vh 5vw; }
+  .vote { width: 92vw; }
+  .vote-top { gap: 12px; margin-bottom: 10px; }
+  .vote-top h2 { font-size: 22px; }
+  .vote-clock { width: 52px; height: 52px; font-size: 22px; }
+  .vote-clock span { width: 36px; height: 36px; }
+  /* 履歷三張上下排；每張裡面兩欄，三張才放得進一個畫面 */
+  .cvs { grid-template-columns: 1fr; gap: 12px; }
+  .cv { display: grid; grid-template-columns: 1fr 1fr; column-gap: 14px; padding: 8px 12px 24px; }
+  .cv-head, .cv-row.comment { grid-column: 1 / -1; }
+  .cv-head { margin-bottom: 2px; }
+  .cv-head b { font-size: 22px; }
+  .cv-head span { font-size: 14px; }
+  .cv-row { gap: 6px; padding: 2px 0; font-size: 13px; }
+  .cv-key { right: 8px; bottom: 6px; width: 26px; height: 26px; font-size: 15px; }
+  .cv-live { left: 12px; right: 44px; bottom: 10px; height: 8px; }
+  .vote-note, .vote-reveal { margin-top: 10px; }
+  .ledger, .view { width: 92vw; }
+  .counts { gap: 8px; }
+  .count b { font-size: 56px; }
+  .book { font-size: 14px; }
+  .book th, .book td { padding: 6px 8px; }
+  .book tbody th { width: 5.5em; }
+  .sides { grid-template-columns: 1fr; }
+  .clipping { width: 88vw; }
+  .lobby h1 { font-size: 56px; }
+  .lobby-row { flex-direction: column; }
+  .lobby-text small { max-width: none; }
+  #title-card h1 { font-size: 64px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
