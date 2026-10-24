@@ -345,9 +345,12 @@ SS.panels = (function () {
 
   const lobby = {
     show(d, link) {
-      // 觀眾自己看的版本沒有台下投票，不放 QR code
+      // 觀眾自己玩的版本沒有台下投票，不放 QR code，改成操作說明
+      const keys = SS.touch
+        ? [['點一下', '繼續'], ['左下搖桿', '走路（推到底快走）'], ['拖曳畫面', '轉視角，兩指縮放'], ['選項、履歷', '直接點'], ['左上角 ☰', '跳段落、暫停']]
+        : [['空白鍵／點一下', '繼續'], ['WASD／方向鍵', '走路（Shift 快走）'], ['拖曳／滾輪', '轉視角／縮放'], ['1／2／3', '選選項（也可以直接點）'], ['N／B／M', '下一段／上一段／段落選單']];
       const body = SS.live.audience
-        ? `<div class="lobby-text"><p>這是我們普社課的報告</p><p>${SS.tip('用鍵盤或滑鼠操作', '用手指操作')}，自己走一遍「同一條街」</p></div>`
+        ? `<div class="lobby-keys">${keys.map(([k, v]) => `<b>${k}</b><span>${v}</span>`).join('')}</div>`
         : `<div class="lobby-qr">${qrSvg(link)}</div>
           <div class="lobby-text">${d.lines.map((l) => `<p>${esc(l)}</p>`).join('')}<small>${esc(link)}</small></div>`;
       showPanel('lobby', `<div class="lobby">

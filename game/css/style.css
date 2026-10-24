@@ -1323,6 +1323,9 @@ body:has(#hud.show) #hud-clock { top: calc(3vh + 96px); }
 .lobby-text { text-align: left; }
 .lobby-text p { margin: 0 0 1vh; font-weight: 900; font-size: clamp(24px, 2.2vw, 44px); }
 .lobby-text small { display: block; max-width: 30vw; margin-top: 2vh; color: var(--muted); font-weight: 700; word-break: break-all; }
+.lobby-keys { display: grid; grid-template-columns: auto 1fr; gap: 1.4vh 1.4vw; align-items: center; text-align: left; font-size: clamp(18px, 1.6vw, 30px); }
+.lobby-keys b { justify-self: start; padding: 2px 14px; background: var(--ink); color: #fff; border-radius: 999px; font-weight: 900; white-space: nowrap; }
+.lobby-keys span { font-weight: 700; }
 .lobby .th-hint { color: #fff; text-align: center; -webkit-text-stroke: 3px var(--ink); paint-order: stroke fill; font-size: clamp(16px, 1.2vw, 24px); }
 .qr-missing { padding: 2vh; color: var(--muted); font-weight: 700; }
 
@@ -1501,6 +1504,8 @@ body:has(#presenter-timer.show) #wip { top: calc(2.4vh + 86px); }
 #next-hint.show { display: block; }
 /* 下方有出處時往上移，不要疊在一起 */
 body:has(#cite.show) #next-hint { bottom: calc(2.4vh + 52px); }
+/* 開場面板自己就寫了「點一下開始」 */
+body:has(#panel.lobby) #next-hint { display: none; }
 /* 橫的畫面有手機時，手機佔住正中間：提示改放左下角（這時搖桿收起來了） */
 @media not all and (max-aspect-ratio: 2/3) {
   body:has(#phone.show) #next-hint { left: 2vw; bottom: 2.4vh; transform: none; animation: none; }
@@ -1620,6 +1625,8 @@ body:has(#phone.show, #panel.show, #title-card.show, #menu.show, #hold.show) #to
   #dialog { max-width: 92vw; min-width: 0; }
   /* 置中的對話框寬度放滿（left:50% 的寫法最多只能用到半個螢幕寬）；講話時不能走，搖桿先藏起來 */
   #dialog.box { left: 4vw; right: 4vw; max-width: none; transform: none; }
+  /* 跟著角色的泡泡：照文字長度展開（ui.js 會把它限制在畫面內） */
+  #dialog.bubble { width: max-content; max-width: 84vw; box-sizing: border-box; }
   body:has(#dialog.show.box) #touch-pad { visibility: hidden; }
   .dlg-text { font-size: 19px; }
   #dialog.loud .dlg-text { font-size: 28px; }
@@ -1668,6 +1675,9 @@ body:has(#phone.show, #panel.show, #title-card.show, #menu.show, #hold.show) #to
   .lobby h1 { font-size: 56px; }
   .lobby-row { flex-direction: column; }
   .lobby-text small { max-width: none; }
+  .lobby-row { padding: 16px 14px; }
+  .lobby-keys { gap: 10px 10px; font-size: 16px; }
+  .lobby-keys b { padding: 2px 10px; }
   #title-card h1 { font-size: 64px; }
 }
 
