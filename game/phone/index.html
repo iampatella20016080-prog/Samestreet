@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#8fe3d6">
+<title>同一條街｜台下互動</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --paper: #ffffff;
+    --sky: #8fe3d6;
+    --red: #e04a3f;
+    --green: #2f9e6a;
+    --muted: #42505a;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--sky);
+    color: var(--ink);
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    font-weight: 900;
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    margin-bottom: 14px;
+  }
+  .status { font-weight: 700; font-size: 13px; letter-spacing: 0; white-space: nowrap; }
+  .dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 6px;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    background: #c9c9c9;
+    vertical-align: -1px;
+  }
+  .dot.on { background: var(--green); }
+  .dot.off { background: var(--red); }
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .card {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 16px;
+    box-shadow: 5px 5px 0 var(--ink);
+    padding: 22px 18px;
+  }
+  h1 {
+    margin: 0 0 18px;
+    font-size: 23px;
+    font-weight: 900;
+    line-height: 1.4;
+  }
+  .opt {
+    display: block;
+    width: 100%;
+    margin: 0 0 12px;
+    padding: 16px 18px;
+    border: 3px solid var(--ink);
+    border-radius: 12px;
+    background: var(--paper);
+    color: var(--ink);
+    font: inherit;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 1.4;
+    text-align: left;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .opt:active { transform: translate(2px, 2px); }
+  .opt.picked { background: var(--ink); color: var(--paper); }
+  .note { min-height: 1.5em; margin: 4px 0 0; font-size: 15px; color: var(--muted); }
+  .wait { text-align: center; }
+  .wait p { margin: 0; }
+  .wait .big { font-size: 21px; font-weight: 900; margin-bottom: 8px; }
+  .dots span { animation: blink 1.4s infinite both; }
+  .dots span:nth-child(2) { animation-delay: 0.2s; }
+  .dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%, 80%, 100% { opacity: 0.2; } 40% { opacity: 1; } }
+  .tapwrap { text-align: center; }
+  .tap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(64vw, 260px);
+    aspect-ratio: 1;
+    margin: 6px auto 16px;
+    border: 4px solid var(--ink);
+    border-radius: 50%;
+    background: var(--paper);
+    box-shadow: 6px 6px 0 var(--ink);
+    color: var(--ink);
+    font: inherit;
+    font-weight: 900;
+    font-size: 46px;
+    cursor: pointer;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .tap:active { transform: translate(3px, 3px); box-shadow: 3px 3px 0 var(--ink); }
+  .count { font-size: 17px; font-weight: 700; margin: 0; }
+  .bubble {
+    position: fixed;
+    z-index: 5;
+    padding: 4px 12px;
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    background: var(--paper);
+    font-weight: 900;
+    font-size: 18px;
+    pointer-events: none;
+    animation: rise 1.3s ease-out forwards;
+  }
+  @keyframes rise {
+    from { opacity: 1; transform: translate(-50%, 0) scale(0.85); }
+    to { opacity: 0; transform: translate(-50%, -150px) scale(1.1); }
+  }
+  footer {
+    margin-top: 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--muted);
+    text-align: center;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bubble, .dots span { animation-duration: 0.01s; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <span>同一條街｜台下互動</span>
+  <span class="status"><i class="dot" id="dot"></i><span id="status-text">連線中</span></span>
+</header>
+<main id="main"></main>
+<footer>只會記下你按了哪個選項，不會收集名字或其他個人資料。</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  const params = new URLSearchParams(location.search);
+  const db = (params.get('db') || '').trim();
+  const room = (params.get('r') || '').trim();
+  const main = document.getElementById('main');
+  const dot = document.getElementById('dot');
+  const statusText = document.getElementById('status-text');
+
+  const el = (tag, cls, text) => {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  };
+
+  function message(title, text) {
+    main.textContent = '';
+    const card = el('div', 'card wait');
+    card.append(el('p', 'big', title), el('p', 'note', text));
+    main.append(card);
+  }
+
+  // 只接受 Firebase 的網址或本機測試
+  const okDb = db === 'local' || /^[a-z0-9-]+(\.[a-z0-9-]+)*\.(firebasedatabase\.app|firebaseio\.com)$/.test(db);
+  const okRoom = /^[A-Za-z0-9_-]{1,40}$/.test(room);
+  if (!okDb || !okRoom) {
+    message('網址不完整', '請重新掃一次台上的 QR code。');
+    statusText.textContent = '';
+    return;
+  }
+
+  // 每支手機一個隨機代號，同一支手機重投只算一票
+  function makeId() {
+    return 'd' + Math.random().toString(36).slice(2, 11);
+  }
+  let dev;
+  try {
+    dev = localStorage.getItem('ss-dev') || makeId();
+    localStorage.setItem('ss-dev', dev);
+  } catch (e) {
+    dev = makeId();
+  }
+
+  // 讀寫：Firebase 用 REST；本機測試用 localStorage（要跟遊戲開在同一個瀏覽器）
+  const parts = (path) => path.split('/').filter(Boolean);
+  const LOCAL_KEY = 'ss-live-local';
+  const local = {
+    tree() {
+      try {
+        return JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}');
+      } catch (e) {
+        return {};
+      }
+    },
+    async get(path) {
+      let node = this.tree();
+      for (const k of parts(path)) {
+        if (node === null || typeof node !== 'object') return null;
+        node = node[k];
+      }
+      return node === undefined ? null : node;
+    },
+    async put(path, val) {
+      const tree = this.tree();
+      const ks = parts(path);
+      let node = tree;
+      for (const k of ks.slice(0, -1)) {
+        if (node[k] === null || typeof node[k] !== 'object') node[k] = {};
+        node = node[k];
+      }
+      node[ks[ks.length - 1]] = val;
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(tree));
+    },
+  };
+  const firebase = {
+    url: (path) => `https://${db}/${path}.json`,
+    async get(path) {
+      const res = await fetch(this.url(path), { cache: 'no-store' });
+      if (!res.ok) throw new Error(res.status);
+      return res.json();
+    },
+    async put(path, val) {
+      const res = await fetch(this.url(path), { method: 'PUT', body: JSON.stringify(val) });
+      if (!res.ok) throw new Error(res.status);
+    },
+  };
+  const store = db === 'local' ? local : firebase;
+
+  let current = null; // 目前的題目
+  const picked = {}; // 題目 → 選了哪個
+  const taps = {}; // 題目 → 按了幾次
+  const keyOf = (q) => (q ? `${q.id}:${q.t}` : '');
+
+  function setStatus(on) {
+    dot.className = 'dot ' + (on ? 'on' : 'off');
+    statusText.textContent = on ? '已連線' : '連不上，請檢查網路';
+  }
+
+  function render() {
+    main.textContent = '';
+    if (!current) return renderWait();
+    if (current.kind === 'tap') return renderTap();
+    return renderChoice();
+  }
+
+  function renderWait() {
+    const card = el('div', 'card wait');
+    const big = el('p', 'big', '等台上出題');
+    const dots = el('span', 'dots');
+    dots.append(el('span', '', '.'), el('span', '', '.'), el('span', '', '.'));
+    big.append(dots);
+    card.append(big, el('p', 'note', '題目出來時這裡會自動換，不用重新整理。'));
+    main.append(card);
+  }
+
+  function renderChoice() {
+    const q = current;
+    const key = keyOf(q);
+    const card = el('div', 'card');
+    const note = el('p', 'note', picked[key] ? '已送出，想改可以再按別的。' : '');
+    card.append(el('h1', '', q.title));
+    const buttons = [];
+    for (const o of Object.values(q.options || {})) {
+      const b = el('button', 'opt' + (picked[key] === o.id ? ' picked' : ''), o.label);
+      b.type = 'button';
+      b.addEventListener('click', async () => {
+        picked[key] = o.id;
+        buttons.forEach((x) => x.classList.toggle('picked', x === b));
+        note.textContent = '送出中…';
+        try {
+          await store.put(`rooms/${room}/a/${q.id}/${dev}`, o.id);
+          if (keyOf(current) === key) note.textContent = '已送出，想改可以再按別的。';
+        } catch (e) {
+          if (keyOf(current) === key) note.textContent = '沒送出去，請再按一次。';
+        }
+      });
+      buttons.push(b);
+      card.append(b);
+    }
+    card.append(note);
+    main.append(card);
+  }
+
+  function renderTap() {
+    const q = current;
+    const key = keyOf(q);
+    const label = (Object.values(q.options || {})[0] || {}).label || 'Siti';
+    const card = el('div', 'card tapwrap');
+    const btn = el('button', 'tap', label);
+    btn.type = 'button';
+    const count = el('p', 'count', '');
+    const showCount = () => {
+      count.textContent = taps[key] ? `你叫了她 ${taps[key]} 次` : '按一下，就是叫她一次';
+    };
+    let sendTimer = null;
+    const send = async () => {
+      sendTimer = null;
+      try {
+        await store.put(`rooms/${room}/n/${dev}`, taps[key]);
+      } catch (e) {
+        count.textContent = '沒送出去，再按一次試試';
+      }
+    };
+    btn.addEventListener('click', () => {
+      taps[key] = (taps[key] || 0) + 1;
+      showCount();
+      bubble(btn, label);
+      if (navigator.vibrate) navigator.vibrate(12);
+      // 連按時合併成一次寫入
+      if (!sendTimer) sendTimer = setTimeout(send, 250);
+    });
+    showCount();
+    card.append(el('h1', '', q.title), btn, count);
+    main.append(card);
+  }
+
+  function bubble(btn, text) {
+    const r = btn.getBoundingClientRect();
+    const b = el('div', 'bubble', text);
+    b.style.left = `${r.left + r.width * (0.25 + Math.random() * 0.5)}px`;
+    b.style.top = `${r.top + r.height * 0.25}px`;
+    document.body.append(b);
+    setTimeout(() => b.remove(), 1400);
+  }
+
+  // 每 1.2 秒問一次目前的題目，題目換了才重畫
+  let fails = 0;
+  let timer = null;
+  let inFlight = false;
+  async function poll() {
+    if (inFlight) return;
+    inFlight = true;
+    clearTimeout(timer);
+    try {
+      const q = await store.get(`rooms/${room}/q`);
+      fails = 0;
+      setStatus(true);
+      if (keyOf(q) !== keyOf(current)) {
+        current = q;
+        render();
+      }
+    } catch (e) {
+      fails += 1;
+      if (fails >= 2) setStatus(false);
+    }
+    inFlight = false;
+    timer = setTimeout(poll, 1200);
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) poll();
+  });
+  renderWait();
+  poll();
+})();
+</script>
+</body>
+</html>
