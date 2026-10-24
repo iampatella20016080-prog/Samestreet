@@ -41,6 +41,9 @@ SS.ui = {
       e.preventDefault();
       SS.input._pressed.add('KeyM');
     });
+    this.nextEl = $('next-hint');
+    this.nextEl.textContent = SS.tip('按空白鍵，或點一下繼續', '點一下繼續');
+    this.nextEl.addEventListener('click', () => SS.input._pressed.add('Space'));
     if (SS.touch) $('hint').textContent = '左下搖桿移動（推到底快走）　拖曳畫面轉視角　兩指縮放　點一下繼續';
     // 手機橫拿時畫面很矮：大面板依螢幕高度等比例縮小（投影和 iPad 的高度夠，比例是 1）
     const fit = () => document.documentElement.style.setProperty('--fit', Math.min(1, Math.max(0.5, innerHeight / 640)).toFixed(3));
@@ -126,6 +129,14 @@ SS.ui = {
       chip.remove();
       arrive();
     }, 1400);
+  },
+
+  // 在等「繼續」卻一直沒人按：有對話框就在框角閃 ▼，沒有就在下方跳出提示（只在觀眾版用）
+  nextHint(on) {
+    const inDialog = on && this.dialog.el.classList.contains('show');
+    const pill = on && !inDialog;
+    if (inDialog !== this._nextDlg) this.dialog.el.classList.toggle('waiting', (this._nextDlg = inDialog));
+    if (pill !== this._nextPill) this.nextEl.classList.toggle('show', (this._nextPill = pill));
   },
 
   // 家務小遊戲的倒數與件數；null 收起
@@ -362,7 +373,7 @@ SS.ui.dialog = {
   init(el) {
     this.el = el;
     el.innerHTML = `<div class="dlg-head"><span class="dlg-name"></span><span class="dlg-lang"></span><span class="dlg-note"></span></div>
-      <div class="dlg-text"></div><div class="dlg-sub"></div><div class="dlg-tag"></div>`;
+      <div class="dlg-text"></div><div class="dlg-sub"></div><div class="dlg-tag"></div><i class="dlg-next">▼</i>`;
     this.nameEl = el.querySelector('.dlg-name');
     this.langEl = el.querySelector('.dlg-lang');
     this.noteEl = el.querySelector('.dlg-note');

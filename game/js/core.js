@@ -130,8 +130,8 @@ SS.input = {
     });
     for (const event of ['pointerup','pointercancel','lostpointercapture']) canvas.addEventListener(event, e => {
       const t = touches.get(e.pointerId);
-      // 手指在畫面空白處輕點一下＝空白鍵（滑鼠點擊不算，免得上台時誤觸）；有選項時要點選項本身
-      if (event === 'pointerup' && t && t.kind === 'look' && e.pointerType !== 'mouse' && touches.size === 1 &&
+      // 在畫面空白處輕點一下＝空白鍵；上台版只算手指（滑鼠點擊不算，免得上台時誤觸）；有選項時要點選項本身
+      if (event === 'pointerup' && t && t.kind === 'look' && (e.pointerType !== 'mouse' || SS.live.audience) && touches.size === 1 &&
           performance.now() - t.t0 < 350 && Math.hypot(e.clientX - t.x0, e.clientY - t.y0) < 12 &&
           !document.querySelector('#choices.show')) {
         this._pressed.add('Space');

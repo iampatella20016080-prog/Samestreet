@@ -10,6 +10,7 @@ SS.director = (function () {
   let token = null;
   let sceneTime = 0;
   let totalTime = 0;
+  let advWait = 0; // 已經等「繼續」幾秒
   const timers = new Set();
   const waiters = new Set();
   const loops = new Set();
@@ -111,7 +112,7 @@ SS.director = (function () {
             res(v);
           };
           const tm = { t, left: sec, res: done };
-          const wt = { t, codes, res: done };
+          const wt = { t, codes, res: done, timed: true };
           timers.add(tm);
           waiters.add(wt);
         });
@@ -258,6 +259,9 @@ SS.director = (function () {
         w.res(code);
       }
     }
+    // 第一次玩的人不知道要按空白鍵：等超過 1.5 秒就提示（觀眾版才有，上台畫面不變）
+    advWait = [...waiters].some((w) => w.codes === ADV && !w.timed) ? advWait + dt : 0;
+    if (SS.live.audience) SS.ui.nextHint(advWait > 1.5);
     for (const l of [...loops]) {
       const v = l.fn(dt);
       if (v !== null && v !== undefined) {

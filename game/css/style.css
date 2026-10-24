@@ -1476,6 +1476,42 @@ body:has(#presenter-timer.show) #wip { top: calc(2.4vh + 86px); }
 }
 #pause-badge.show { display: block; pointer-events: auto; cursor: pointer; }
 
+/* ---------- 等太久沒按「繼續」的提示（觀眾版） ---------- */
+#next-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 3vh;
+  z-index: 26;
+  display: none;
+  padding: 8px 20px;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: #fff;
+  border: 3px solid #fff;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: clamp(15px, 1.2vw, 22px);
+  pointer-events: auto;
+  cursor: pointer;
+  animation: next-bob 1.2s ease-in-out infinite;
+}
+#next-hint.show { display: block; }
+#next-hint::after { content: "　▶"; color: var(--yellow); }
+@keyframes next-bob { 50% { transform: translateX(-50%) translateY(-5px); } }
+.dlg-next {
+  position: absolute;
+  right: 14px;
+  bottom: 6px;
+  display: none;
+  color: var(--red);
+  font-style: normal;
+  font-size: clamp(14px, 1vw, 20px);
+  animation: next-blink 0.9s steps(2) infinite;
+}
+#dialog.waiting .dlg-next { display: block; }
+@keyframes next-blink { 50% { opacity: 0; } }
+#phone.show .phone-body { pointer-events: auto; cursor: pointer; }
+
 /* ---------- 手機、iPad ---------- */
 /* 長按時不要跳出選字、放大鏡；連點不要放大頁面 */
 #ui { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }

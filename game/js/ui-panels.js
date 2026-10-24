@@ -73,6 +73,8 @@ SS.panels = (function () {
       this.captionEl = q('.ph-caption');
       this.confirmEl = q('.ph-confirm');
       this.ringName = q('.ph-ringname');
+      // 點手機畫面也能繼續（跟點對話框一樣）
+      el.addEventListener('click', () => SS.input._pressed.add('Space'));
     },
     open(mode) {
       this.el.className = `show ${mode}`;
