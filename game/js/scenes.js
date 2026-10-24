@@ -1084,7 +1084,8 @@ SS.scenes = (function () {
         SS.ui.hud.setMask(1);
         // Siti 走到頂樓水塔旁邊的角落；禮拜毯先捲著
         const siti = stage.actors.siti;
-        const spot = at(base, 2.75, 9.5, 1.8);
+        // 離矮牆留一公尺多：叩首時頭會往前一公尺，太靠牆會穿過去
+        const spot = at(base, 1.9, 9.5, 1.8);
         siti.root.visible = true;
         siti.root.position.copy(spot);
         faceTo(siti, at(base, 4.5, 9.5, 1.8));
@@ -1117,7 +1118,23 @@ SS.scenes = (function () {
         SS.ui.hud.vanish(true, d.prayerSec * 0.6);
         SS.ui.setClock(null);
         ctx.shot(at(base, 6.6, 10.7, 6.6), at(base, 1.4, 12.9, -1.4), d.prayerSec);
-        await ctx.wait(d.prayerSec);
+        // 跪坐 → 叩首 → 跪坐 → 叩首 → 跪坐（時間點以 10 秒為準，等比例縮放）
+        const keys = [[0, 0], [1.6, 0], [2.6, 1], [4.4, 1], [5.4, 0], [6.4, 0], [7.4, 1], [9, 1], [10, 0]];
+        let tp = 0;
+        await ctx.loop((dt) => {
+          tp += dt;
+          const k = (tp * 10) / d.prayerSec;
+          const i = keys.findIndex(([t]) => t >= k);
+          if (i > 0) {
+            const [t0, v0] = keys[i - 1];
+            const [t1, v1] = keys[i];
+            siti.bow = v0 + (v1 - v0) * SS.util.ease.inOut((k - t0) / (t1 - t0));
+          } else siti.bow = 0;
+          siti.animate(dt, 0);
+          return tp >= d.prayerSec ? true : null;
+        });
+        siti.bow = 0;
+        siti.animate(0, 0);
         // 收起禮拜毯，打視訊給女兒
         siti.setPose('stand');
         await ctx.loop((dt) => {

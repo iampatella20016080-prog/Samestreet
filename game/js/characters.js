@@ -260,6 +260,53 @@ SS.chars = (function () {
 
     root.scale.setScalar(o.scale);
 
+    // 跪坐用的腿：一般的腿只有一節折不起來，跪的時候換成大腿、小腿兩節（放在 root 底下，身體前傾時不會跟著轉）
+    let fold = null;
+    const UP = new THREE.Vector3(0, 1, 0);
+    const between = (mesh, a, b) => {
+      mesh.position.copy(a).add(b).multiplyScalar(0.5);
+      mesh.quaternion.setFromUnitVectors(UP, b.clone().sub(a).normalize());
+    };
+    function makeFold() {
+      const g = new THREE.Group();
+      const thighGeo = new THREE.CapsuleGeometry(0.085, 0.24, 4, 10);
+      const shinGeo = new THREE.CapsuleGeometry(0.078, 0.25, 4, 10);
+      const sides = [-1, 1].map((s) => {
+        const thigh = M(thighGeo, o.bottom);
+        const shin = M(shinGeo, o.bottom);
+        const foot = M(shoeGeo, o.shoes, 0);
+        foot.scale.set(0.095, 0.06, 0.13);
+        g.add(thigh, shin, foot);
+        return { s, thigh, shin, foot };
+      });
+      root.add(g);
+      return { g, sides };
+    }
+    // 禮拜的姿勢：t＝0 跪坐（坐在腳跟上、手放大腿），t＝1 叩首（額頭貼地、手掌貼地、臀部抬起）
+    function kneel(t) {
+      const L = SS.util.lerp;
+      const hy = L(0.27, 0.5, t);
+      const a = L(0.06, 1.85, t);
+      // 上半身以髖關節為軸往前彎
+      body.rotation.set(a, 0, 0);
+      body.position.set(0, hy - hipY * Math.cos(a), -hipY * Math.sin(a));
+      headPivot.rotation.x = L(0.3, 0, t);
+      for (const arm of arms) {
+        arm.rotation.x = -(a + L(0.5, 0.8, t));
+        arm.rotation.z = (arm.position.x > 0 ? 1 : -1) * L(-0.12, 0.2, t);
+      }
+      const kneeZ = L(0.36, 0.02, t);
+      for (const { s, thigh, shin, foot } of fold.sides) {
+        const x = 0.1 * s;
+        const hip = new THREE.Vector3(x, hy, 0);
+        const knee = new THREE.Vector3(x, 0.09, kneeZ);
+        const ankle = new THREE.Vector3(x, 0.08, kneeZ - 0.38);
+        between(thigh, hip, knee);
+        between(shin, knee, ankle);
+        foot.position.set(x, 0.09, kneeZ - 0.44);
+      }
+    }
+
     const person = {
       root,
       body,
@@ -276,21 +323,27 @@ SS.chars = (function () {
         body.rotation.set(0, 0, 0);
         headPivot.rotation.x = 0;
         for (const a of arms) a.rotation.set(0, 0, a.position.x > 0 ? 0.075 : -0.075);
-        for (const l of legs) l.rotation.set(0, 0, 0);
+        for (const l of legs) {
+          l.rotation.set(0, 0, 0);
+          l.visible = kind !== 'kneel';
+        }
+        if (fold) fold.g.visible = kind === 'kneel';
         this.poseY = 0;
+        body.position.set(0, 0, 0);
         if (kind === 'sit') {
           this.poseY = seatY - hipY + 0.05;
           for (const l of legs) l.rotation.x = -1.3;
           for (const a of arms) a.rotation.x = -0.55;
         } else if (kind === 'kneel') {
-          this.poseY = -0.36;
-          for (const l of legs) l.rotation.x = 1.42;
-          for (const a of arms) a.rotation.x = -0.35;
-          body.rotation.x = 0.12;
-          headPivot.rotation.x = 0.28;
+          if (!fold) fold = makeFold();
+          this.bow = 0;
+          kneel(0);
+          return;
         }
         body.position.y = this.poseY;
       },
+      // 跪著的時候：0 跪坐、1 叩首，中間的值是正在彎下去或起來
+      bow: 0,
       // 頭轉向（弧度，正值往人物左邊）；k 越大轉得越快
       turnHead(yaw, k = 1) {
         headPivot.rotation.y += (SS.util.clamp(yaw, -1.25, 1.25) - headPivot.rotation.y) * k;
@@ -303,7 +356,11 @@ SS.chars = (function () {
       // amount：0 站著，1 全速跑
       animate(dt, amount, freq = 9) {
         const idle = performance.now() * 0.002;
-        if (this.pose === 'sit' || this.pose === 'kneel') {
+        if (this.pose === 'kneel') {
+          kneel(this.bow);
+          return;
+        }
+        if (this.pose === 'sit') {
           body.position.y = this.poseY + Math.sin(idle) * 0.006;
           return;
         }

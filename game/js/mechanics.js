@@ -320,7 +320,8 @@ SS.mech = {
       const holding = I.down('KeyE');
       const near = (q, r) => Math.hypot(p.x - q.x, p.z - q.z) < r;
       if (call) {
-        if (holding && near(agongSpot, 1.35)) {
+        // 安撫阿公的範圍放大：站在輪椅附近任何一邊都算，不用對準
+        if (holding && near(agongSpot, 2.3)) {
           call.progress += dt / opts.answerSeconds;
           heading.set(agongSpot.x - p.x, 0, agongSpot.z - p.z).normalize();
           if (call.progress >= 1) {
