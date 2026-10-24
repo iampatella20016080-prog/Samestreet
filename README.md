@@ -3,7 +3,7 @@
 普社課小組報告：用 Three.js 做的漫畫風 3D 遊戲取代投影片，上台約 9 分鐘、13 個段落。
 
 ## 怎麼開
-雙擊 `game\index.html`，用 Chrome 開啟（要有網路：Three.js、字型、QR code、手機互動都從網路載入）。F 鍵全螢幕；WASD／方向鍵移動，Shift 快走，滑鼠拖曳轉視角。
+雙擊 `game/index.html`，用 Chrome 開啟（要有網路：Three.js、字型、QR code、手機互動都從網路載入）。F 鍵全螢幕；WASD／方向鍵移動，Shift 快走，滑鼠拖曳轉視角。
 
 ## 上台用的按鍵
 | 按鍵 | 功能 |
@@ -23,8 +23,8 @@
 ## 檔案
 | 檔案 | 用途 |
 |---|---|
-| `game\` | 遊戲本體（`index.html`、`css\`、`js\`）；台詞都在 `game\js\data.js` |
-| `game\CHANGELOG.md` | 修改紀錄 |
+| `game/` | 遊戲本體（`index.html`、`css/`、`js/`）；台詞都在 `game/js/data.js` |
+| `game/CHANGELOG.md` | 修改紀錄 |
 | `遊戲製作說明.md` | 技術規格與分階段製作計畫 |
 | `進化企劃.md` | 遊戲目前進度與接下來要做的事 |
 | `同一條街_劇本.md` | 劇本（另有 `_v0.2`、`初稿`） |
