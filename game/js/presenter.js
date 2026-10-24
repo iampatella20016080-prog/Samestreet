@@ -14,11 +14,32 @@ SS.presenter = {
     this.menuEl = document.getElementById('menu');
     this.pauseEl = document.getElementById('pause-badge');
     this.menuEl.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('[data-act]')) return;
       const item = e.target.closest('[data-i]');
-      if (!item) return;
+      // 點選單外面＝關閉
+      if (!item) {
+        if (!e.target.closest('.menu-box')) this.closeMenu();
+        return;
+      }
       this.closeMenu();
       SS.director.go(Number(item.dataset.i));
     });
+    // 觸控裝置的按鈕列；全螢幕要在 click 裡呼叫，瀏覽器才准
+    this.menuEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-act]');
+      if (btn) this.act(btn.dataset.act);
+    });
+    this.pauseEl.textContent = SS.tip('暫停（P 繼續）', '暫停（點這裡繼續）');
+    this.pauseEl.addEventListener('click', () => this.togglePause());
+  },
+
+  act(name) {
+    this.closeMenu();
+    if (name === 'prev') SS.director.prev();
+    else if (name === 'next') SS.director.next();
+    else if (name === 'pause') this.togglePause();
+    else if (name === 'mute') SS.ui.toast(SS.sfx.toggle() ? '音效：關' : '音效：開');
+    else if (name === 'full') SS.input.toggleFullscreen();
   },
 
   update() {
@@ -93,14 +114,25 @@ SS.presenter = {
     this.menuOpen = true;
     this.menuSel = SS.director.index;
     const list = SS.director.list;
-    this.menuEl.innerHTML = `<div class="menu-box"><h2>段落選單</h2><ol>${list
+    this.menuEl.innerHTML = `<div class="menu-box"><h2>段落選單</h2>${SS.touch ? this.touchBar() : ''}<ol>${list
       .map((s, i) => {
         const sec = (SS.DATA.scenes[s.id] || {}).targetSec;
         return `<li data-i="${i}"><b>${i}</b><span>${this.title(i)}</span><em>${sec ? this.fmt(sec) : ''}</em></li>`;
       })
-      .join('')}</ol><p>↑↓ 選擇　Enter 跳過去　M 關閉</p></div>`;
+      .join('')}</ol><p>${SS.tip('↑↓ 選擇　Enter 跳過去　M 關閉', '點段落跳過去　點外面關閉')}</p></div>`;
     this.menuEl.classList.add('show');
     this.moveMenu(0);
+  },
+
+  touchBar() {
+    const btns = [
+      ['prev', '上一段'],
+      ['next', '下一段'],
+      ['pause', SS.state.paused ? '繼續' : '暫停'],
+      ['mute', SS.sfx.muted ? '開音效' : '靜音'],
+    ];
+    if (SS.input.canFullscreen) btns.push(['full', '全螢幕']);
+    return `<div class="menu-acts">${btns.map(([k, t]) => `<button type="button" data-act="${k}">${t}</button>`).join('')}</div>`;
   },
 
   moveMenu(d) {

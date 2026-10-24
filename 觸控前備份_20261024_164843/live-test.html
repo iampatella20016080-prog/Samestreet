@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>台下互動測試</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --paper: #ffffff;
+    --sky: #8fe3d6;
+    --red: #e04a3f;
+    --green: #2f9e6a;
+    --muted: #42505a;
+    --bar: #f2c94c;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--sky);
+    color: var(--ink);
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  }
+  body { padding: 24px 16px 40px; overflow-x: hidden; }
+  header { max-width: 1280px; margin: 0 auto 18px; }
+  h1 { margin: 0 0 4px; font-size: clamp(24px, 3vw, 36px); font-weight: 900; }
+  .mode { margin: 0; font-weight: 700; color: var(--muted); }
+  .layout {
+    display: grid;
+    gap: 18px;
+    max-width: 1280px;
+    margin: 0 auto;
+    grid-template-columns: minmax(240px, 340px) 1fr;
+  }
+  @media (max-width: 820px) { .layout { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 16px;
+    box-shadow: 5px 5px 0 var(--ink);
+    padding: 18px;
+    min-width: 0;
+  }
+  .join { text-align: center; }
+  #qr svg { width: 100%; height: auto; max-width: 300px; display: block; margin: 0 auto; }
+  .link { margin: 10px 0 0; font-size: 13px; color: var(--muted); word-break: break-all; }
+  .status { margin: 10px 0 0; font-weight: 700; }
+  .dot {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    margin-right: 6px;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    background: #c9c9c9;
+    vertical-align: -1px;
+  }
+  .dot.on { background: var(--green); }
+  .dot.off { background: var(--red); }
+  .right { display: grid; gap: 18px; min-width: 0; }
+  h2 { margin: 0 0 12px; font-size: 18px; font-weight: 900; }
+  .buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+  button {
+    padding: 10px 14px;
+    border: 3px solid var(--ink);
+    border-radius: 10px;
+    background: var(--paper);
+    color: var(--ink);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button.active { background: var(--ink); color: var(--paper); }
+  button.danger { border-color: var(--red); color: var(--red); }
+  .row { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .msg { margin: 10px 0 0; min-height: 1.4em; color: var(--red); font-weight: 700; }
+  .result { min-height: 260px; }
+  .qtitle { margin: 0 0 16px; font-size: clamp(22px, 2.6vw, 34px); font-weight: 900; line-height: 1.35; }
+  .bar { margin-bottom: 14px; }
+  .bar-label { display: flex; justify-content: space-between; gap: 12px; font-weight: 700; font-size: 18px; margin-bottom: 4px; }
+  .bar-track { height: 26px; border: 3px solid var(--ink); border-radius: 8px; overflow: hidden; background: #f4f4f4; }
+  .bar-fill { height: 100%; width: 0; background: var(--bar); transition: width 0.4s ease; }
+  .total { margin: 6px 0 0; color: var(--muted); font-weight: 700; }
+  .big-number { font-size: clamp(64px, 10vw, 140px); font-weight: 900; line-height: 1; margin: 6px 0; }
+  .empty { color: var(--muted); font-weight: 700; font-size: 18px; }
+  #bubbles { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 10; }
+  .bubble {
+    position: absolute;
+    bottom: -60px;
+    padding: 6px 16px;
+    border: 3px solid var(--ink);
+    border-radius: 16px;
+    background: var(--paper);
+    font-weight: 900;
+    font-size: 26px;
+    animation: rise 3.2s ease-out forwards;
+  }
+  @keyframes rise {
+    0% { transform: translateY(0) scale(0.7); opacity: 0; }
+    12% { opacity: 1; }
+    100% { transform: translateY(-70vh) scale(1.05); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>台下互動測試</h1>
+  <p class="mode" id="mode"></p>
+</header>
+<div class="layout">
+  <section class="card join">
+    <div id="qr"></div>
+    <p class="link" id="link"></p>
+    <p class="status"><i class="dot" id="dot"></i><span id="status">連線中…</span></p>
+  </section>
+  <div class="right">
+    <section class="card">
+      <h2>出題</h2>
+      <div class="buttons" id="buttons"></div>
+      <div class="row">
+        <button type="button" id="close">收題</button>
+        <button type="button" id="reset" class="danger">清空結果</button>
+      </div>
+      <p class="msg" id="msg"></p>
+    </section>
+    <section class="card result" id="result"></section>
+  </div>
+</div>
+<div id="bubbles"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script src="js/live-config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/live.js"></script>
+<script>
+(function () {
+  const L = SS.live;
+  const Q = SS.DATA.live;
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, cls, text) => {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  };
+  const fail = (e) => {
+    $('msg').textContent = '出錯了：' + e.message;
+  };
+
+  const link = L.phoneLink();
+  $('link').textContent = link;
+  if (window.qrcode) {
+    const qr = qrcode(0, 'M');
+    qr.addData(link);
+    qr.make();
+    $('qr').innerHTML = qr.createSvgTag({ cellSize: 6, margin: 2, scalable: true });
+  } else {
+    $('qr').textContent = 'QR code 沒載入（要有網路）';
+  }
+  $('mode').textContent = L.mode === 'local'
+    ? '本機測試模式：手機頁請用同一個瀏覽器的另一個分頁開上面的網址'
+    : 'Firebase：' + SS.LIVE_CONFIG.db;
+
+  for (const q of Object.values(Q)) {
+    const b = el('button', '', q.title);
+    b.type = 'button';
+    b.dataset.id = q.id;
+    b.addEventListener('click', () => {
+      $('msg').textContent = '';
+      L.ask(q).catch(fail);
+    });
+    $('buttons').append(b);
+  }
+  $('close').addEventListener('click', () => L.close().catch(fail));
+  $('reset').addEventListener('click', () => {
+    if (confirm('要清空所有答案和叫名字的次數嗎？')) L.reset().catch(fail);
+  });
+
+  L.on('status', (on) => {
+    $('dot').className = 'dot ' + (on ? 'on' : 'off');
+    $('status').textContent = on ? '已連線' : '連不上';
+  });
+
+  function render(s) {
+    document.querySelectorAll('#buttons button').forEach((b) => {
+      b.classList.toggle('active', !!s.q && b.dataset.id === s.q.id);
+    });
+    const box = $('result');
+    box.textContent = '';
+    if (!s.q) {
+      box.append(el('p', 'empty', '目前沒有題目。按上面的按鈕出題，手機畫面會跟著換。'));
+      box.append(el('p', 'total', `叫她名字的人：${s.people}（共按了 ${s.taps} 次）`));
+      return;
+    }
+    box.append(el('p', 'qtitle', s.q.title));
+    if (s.q.kind === 'tap') {
+      box.append(el('p', 'total', '手機上叫她名字的人'));
+      box.append(el('p', 'big-number', String(s.people)));
+      box.append(el('p', 'total', `共按了 ${s.taps} 次`));
+      return;
+    }
+    const counts = L.tally(s.q.id);
+    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+    for (const o of Object.values(s.q.options || {})) {
+      const n = counts[o.id] || 0;
+      const pct = total ? Math.round((n / total) * 100) : 0;
+      const bar = el('div', 'bar');
+      const label = el('div', 'bar-label');
+      label.append(el('span', '', o.label), el('span', '', `${n} 票（${pct}%）`));
+      const track = el('div', 'bar-track');
+      const fill = el('div', 'bar-fill');
+      fill.style.width = pct + '%';
+      track.append(fill);
+      bar.append(label, track);
+      box.append(bar);
+    }
+    box.append(el('p', 'total', `已經有 ${total} 人回答`));
+  }
+  L.on('update', render);
+
+  // 有人按了叫名字：從畫面下方冒出「Siti」泡泡
+  L.on('taps', (n) => {
+    const count = Math.min(n, 30);
+    for (let i = 0; i < count; i++) {
+      setTimeout(() => {
+        const b = el('div', 'bubble', 'Siti');
+        b.style.left = 8 + Math.random() * 80 + 'vw';
+        $('bubbles').append(b);
+        setTimeout(() => b.remove(), 3300);
+      }, i * (700 / count));
+    }
+  });
+
+  L.start();
+})();
+</script>
+</body>
+</html>

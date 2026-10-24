@@ -33,6 +33,19 @@ SS.ui = {
     for (const el of [this.dialog.el, this.captionEl, this.titleEl]) {
       el.addEventListener('pointerdown', () => SS.input._pressed.add('Space'));
     }
+    // 觸控：按住圓圈＝按住空白鍵、右下角按鈕＝按住 E、左上角 ☰ 叫出段落選單
+    SS.input.bindHold(this.hold.el, 'Space');
+    this.actEl = $('touch-act');
+    SS.input.bindHold(this.actEl, 'KeyE');
+    $('touch-menu').addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      SS.input._pressed.add('KeyM');
+    });
+    if (SS.touch) $('hint').textContent = '左下搖桿移動（推到底快走）　拖曳畫面轉視角　兩指縮放　點一下繼續';
+    // 手機橫拿時畫面很矮：大面板依螢幕高度等比例縮小（投影和 iPad 的高度夠，比例是 1）
+    const fit = () => document.documentElement.style.setProperty('--fit', Math.min(1, Math.max(0.5, innerHeight / 640)).toFixed(3));
+    fit();
+    window.addEventListener('resize', fit);
   },
 
   // 換段落時把上一段的介面全部收掉；上一段若停在黑幕，就從黑幕淡入
@@ -118,6 +131,7 @@ SS.ui = {
   // 家務小遊戲的倒數與件數；null 收起
   chores(st) {
     const el = this.choresEl;
+    this.actEl.classList.toggle('show', !!st);
     if (!st) {
       el.className = '';
       el.innerHTML = '';
@@ -125,7 +139,7 @@ SS.ui = {
     }
     el.className = `show${st.left <= 5 ? ' hurry' : ''}`;
     el.innerHTML = `<b>剩 ${Math.max(0, Math.ceil(st.left))} 秒</b><span>做完 ${st.done} 件　還有 ${st.remaining} 件</span>
-      <small>WASD 走過去，按住 E 做家務；阿公叫人時，要先跑回阿公旁邊按住 E</small>`;
+      <small>${SS.tip('WASD 走過去，按住 E 做家務；阿公叫人時，要先跑回阿公旁邊按住 E', '用搖桿走過去，按住右下角按鈕做家務；阿公叫人時，要先跑回阿公旁邊按住')}</small>`;
   },
 
   // 時間到：3D 畫面變灰

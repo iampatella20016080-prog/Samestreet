@@ -231,7 +231,7 @@ SS.director = (function () {
         (e) => {
           if (e === CANCEL) return;
           console.error(e);
-          SS.ui.toast('這一段出錯了，請按 N 跳到下一段');
+          SS.ui.toast(SS.tip('這一段出錯了，請按 N 跳到下一段', '這一段出錯了，請從左上角 ☰ 跳到下一段'));
         }
       );
     SS.bus.emit('scene', scene, i);
@@ -553,7 +553,7 @@ SS.scenes = (function () {
         const c = liveCounts(q);
         const max = Math.max(...c);
         if (max > 0) choice = c.indexOf(max);
-        else SS.ui.toast('手機還沒有人投票：請按 1、2、3 記下舉手最多的');
+        else SS.ui.toast(SS.live.audience ? SS.tip('請按 1、2、3 選一位', '請點一張履歷，選一位') : '手機還沒有人投票：請按 1、2、3 記下舉手最多的');
       }
     }
     SS.live.close().catch(() => {});

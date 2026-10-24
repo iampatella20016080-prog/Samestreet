@@ -56,6 +56,12 @@ SS.state = {
   calls: { name: [], gaikao: [], yating: [] }, // 每叫一次記一筆是誰叫的（叫名字／外勞／雅婷）
 };
 
+// 手機、iPad 這類用手指操作的裝置：介面改顯示觸控說明、多出觸控按鈕
+SS.touch = window.matchMedia('(pointer: coarse)').matches;
+document.documentElement.classList.toggle('touch', SS.touch);
+// 依觸控與否挑說明文字
+SS.tip = (key, touch) => (SS.touch ? touch : key);
+
 SS.input = {
   keys: new Set(),
   _pressed: new Set(),
@@ -104,7 +110,7 @@ SS.input = {
     });
     canvas.addEventListener('pointerdown', e => {
       try { canvas.setPointerCapture(e.pointerId); } catch (_) { /* 非實體指標事件 */ }
-      touches.set(e.pointerId, { kind: 'look', x: e.clientX, y: e.clientY });
+      touches.set(e.pointerId, { kind: 'look', x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, t0: performance.now() });
       lookPointer = e.pointerId;
     });
     canvas.addEventListener('pointermove', e => {
@@ -123,6 +129,13 @@ SS.input = {
       t.x = e.clientX; t.y = e.clientY;
     });
     for (const event of ['pointerup','pointercancel','lostpointercapture']) canvas.addEventListener(event, e => {
+      const t = touches.get(e.pointerId);
+      // 手指在畫面空白處輕點一下＝空白鍵（滑鼠點擊不算，免得上台時誤觸）；有選項時要點選項本身
+      if (event === 'pointerup' && t && t.kind === 'look' && e.pointerType !== 'mouse' && touches.size === 1 &&
+          performance.now() - t.t0 < 350 && Math.hypot(e.clientX - t.x0, e.clientY - t.y0) < 12 &&
+          !document.querySelector('#choices.show')) {
+        this._pressed.add('Space');
+      }
       touches.delete(e.pointerId); lastPinch = null;
       if (lookPointer === e.pointerId) lookPointer = null;
     });
@@ -147,8 +160,27 @@ SS.input = {
     this._pressed.clear();
     if (!this.lookEnabled) { this.lookDelta.x = this.lookDelta.y = 0; this.zoomDelta = 0; }
   },
+  // 讓畫面上的按鈕當成「按住某個鍵」：手指按著就算按著（早餐店微笑、家務）
+  bindHold(el, code) {
+    el.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      try { el.setPointerCapture(e.pointerId); } catch (_) { /* 非實體指標事件 */ }
+      this.keys.add(code);
+      el.classList.add('pressing');
+    });
+    for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) el.addEventListener(event, () => {
+      this.keys.delete(code);
+      el.classList.remove('pressing');
+    });
+  },
+  // iPhone 的 Safari 不支援網頁全螢幕，iPad 要用 webkit 開頭的版本
+  canFullscreen: !!(document.fullscreenEnabled || document.webkitFullscreenEnabled),
   toggleFullscreen() {
-    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
-    else document.exitFullscreen?.();
+    const root = document.documentElement;
+    if (!(document.fullscreenElement || document.webkitFullscreenElement)) {
+      (root.requestFullscreen || root.webkitRequestFullscreen)?.call(root);
+    } else {
+      (document.exitFullscreen || document.webkitExitFullscreen)?.call(document);
+    }
   },
 };

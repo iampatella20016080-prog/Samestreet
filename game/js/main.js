@@ -131,7 +131,8 @@ function buildCast(scene, refs) {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.getElementById('app').appendChild(renderer.domElement);
   SS.input.init();
-  window.addEventListener('pointerdown', () => SS.sfx.unlock());
+  // iPhone／iPad 要等手指放開（touchend、click）才准出聲
+  for (const ev of ['pointerdown', 'touchend', 'click']) window.addEventListener(ev, () => SS.sfx.unlock());
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(SS.PAL.skyBottom);

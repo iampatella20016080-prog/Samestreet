@@ -1474,7 +1474,118 @@ body:has(#presenter-timer.show) #wip { top: calc(2.4vh + 86px); }
   font-weight: 900;
   font-size: clamp(28px, 2.6vw, 50px);
 }
-#pause-badge.show { display: block; }
+#pause-badge.show { display: block; pointer-events: auto; cursor: pointer; }
+
+/* ---------- 手機、iPad ---------- */
+/* 長按時不要跳出選字、放大鏡；連點不要放大頁面 */
+#ui { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+#ui button, #panel, #dialog, #caption, #title-card, #menu, .choice { touch-action: manipulation; }
+
+/* 按住圓圈＝按住空白鍵（早餐店微笑） */
+.touch #hold { pointer-events: auto; touch-action: none; cursor: pointer; }
+.touch #hold svg { width: clamp(120px, 16vh, 170px); transition: transform 0.12s ease; }
+.touch #hold.pressing svg { transform: rotate(-90deg) scale(0.92); }
+
+/* 右下角：按住做家務（＝按住 E） */
+#touch-act {
+  position: absolute;
+  right: 28px;
+  bottom: 30px;
+  z-index: 8;
+  display: none;
+  width: 130px;
+  height: 130px;
+  padding: 0;
+  background: var(--yellow);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  box-shadow: 4px 4px 0 var(--ink);
+  font: 900 22px/1.25 var(--ui-font);
+  pointer-events: auto;
+  touch-action: none;
+}
+.touch #touch-act.show { display: block; }
+#touch-act.pressing { background: var(--green); color: #fff; transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+
+/* 左上角 ☰：段落選單 */
+#touch-menu {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 32;
+  display: none;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  box-shadow: 3px 3px 0 var(--ink);
+  font: 900 24px/1 var(--ui-font);
+  pointer-events: auto;
+}
+.touch #touch-menu { display: block; }
+.touch #presenter-timer, .touch #wip { left: 72px; }
+.menu-acts { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.menu-acts button {
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 6px 12px;
+  background: var(--cream);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  font: 900 16px var(--ui-font);
+}
+.touch .menu-box li { padding: 11px 10px; }
+
+/* 畫面矮（手機橫拿）：大面板依 --fit 等比例縮小，--fit 由 ui.js 依螢幕高度算 */
+#panel > *, #choices, .menu-box, .qr-box { zoom: var(--fit, 1); }
+@media (max-height: 639px) {
+  /* 縮小後還塞不下就讓面板捲動 */
+  #panel.show { overflow-y: auto; align-items: safe center; }
+  .theory { max-height: none; }
+  /* 對話框相對變高，選項改放上方，不要疊在一起 */
+  #choices { bottom: auto; top: 3vh; }
+}
+@media (max-height: 500px) {
+  #dialog { padding: 8px 16px 10px; }
+  #dialog.box { bottom: 4vh; }
+  .dlg-text { font-size: 18px; }
+  #dialog.loud .dlg-text { font-size: 26px; }
+  .phone-body { height: 92vh; aspect-ratio: 9 / 13; padding: 8px; border-radius: 28px; }
+  .phone-screen { font-size: 13px; border-radius: 22px; }
+  .phone-notch { top: 10px; height: 14px; }
+  .ph-head { padding: 24px 12px 8px; }
+  .ph-log { gap: 8px; padding: 10px; }
+  .ph-input { padding: 8px 10px 12px; }
+  #touch-pad { left: 20px; bottom: 18px; width: 116px; height: 116px; }
+  #touch-nub { width: 50px; height: 50px; }
+  #touch-act { right: 20px; bottom: 18px; width: 100px; height: 100px; font-size: 18px; }
+  #touch-menu { top: 8px; left: 8px; width: 42px; height: 42px; font-size: 20px; }
+}
+
+/* 手機直拿：請轉成橫的 */
+#rotate {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  place-items: center;
+  background: var(--cream);
+  color: var(--ink);
+  text-align: center;
+  pointer-events: auto;
+}
+#rotate b { display: inline-block; font-size: 72px; line-height: 1; animation: turn 2.4s ease-in-out infinite; }
+#rotate p { margin: 16px 0 8px; font-weight: 900; font-size: 26px; }
+#rotate small { display: block; padding: 0 24px; color: var(--muted); font-weight: 700; font-size: 15px; }
+@keyframes turn { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(90deg); } }
+@media (pointer: coarse) and (orientation: portrait) and (max-width: 600px) {
+  #rotate { display: grid; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01s !important; animation-iteration-count: 1 !important; }

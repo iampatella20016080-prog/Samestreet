@@ -4,7 +4,16 @@
 window.SS = window.SS || {};
 
 SS.live = (function () {
-  const conf = () => SS.LIVE_CONFIG || { db: 'local', phoneUrl: 'phone/', room: 'test' };
+  // 只有上台那台電腦才連到台下的房間：直接雙擊開檔、本機伺服器，或網址加上 ?host。
+  // 觀眾用手機、iPad 打開公開網址時，投票只存在自己的瀏覽器裡，不會改到上台那一場的題目
+  const host =
+    location.protocol === 'file:' ||
+    /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) ||
+    new URLSearchParams(location.search).has('host');
+  const conf = () => {
+    const c = SS.LIVE_CONFIG || { db: 'local', phoneUrl: 'phone/', room: 'test' };
+    return host ? c : { ...c, db: 'local' };
+  };
   const handlers = {};
   const state = { online: null, q: null, a: {}, n: {}, people: 0, taps: 0 };
   let running = false;
@@ -132,6 +141,8 @@ SS.live = (function () {
 
   return {
     state,
+    // 觀眾自己看的版本（沒有連到台下投票）
+    audience: !host,
     // 回傳取消訂閱的函式
     on(ev, fn) {
       (handlers[ev] = handlers[ev] || []).push(fn);

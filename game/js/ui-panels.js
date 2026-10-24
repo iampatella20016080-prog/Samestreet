@@ -11,7 +11,10 @@ SS.panels = (function () {
     choicesEl = $('choices');
     qrEl = $('qr');
     phone.init($('phone'));
-    panelEl.addEventListener('pointerdown', () => SS.input._pressed.add('Space'));
+    // 用 click 不用 pointerdown：手機上面板塞不下時要能捲動，捲動不能算成「繼續」；點履歷卡另外處理
+    panelEl.addEventListener('click', (e) => {
+      if (!e.target.closest('.cv')) SS.input._pressed.add('Space');
+    });
   }
 
   function reset() {
@@ -139,7 +142,7 @@ SS.panels = (function () {
         <div class="th-lead">${c.lead.map((p) => `<p>${esc(p)}</p>`).join('')}</div>
         <p class="th-body">${esc(c.body)}</p>
         <div class="th-source">${esc(c.source)}</div>
-        <div class="th-hint">按空白鍵繼續</div>
+        <div class="th-hint">${SS.tip('按空白鍵繼續', '點一下繼續')}</div>
       </article>`);
     },
     hide: hidePanel,
@@ -160,9 +163,13 @@ SS.panels = (function () {
       showPanel('vote', `<div class="vote">
         <div class="vote-top"><h2>${esc(question)}</h2><div class="vote-clock" style="--sec:${seconds}s"><span>${seconds}</span></div></div>
         <div class="cvs">${cards}</div>
-        <div class="vote-note">台下用手機投票，或舉手後由操作的人按 1、2、3 記錄</div>
+        <div class="vote-note">${SS.live.audience ? SS.tip('按 1、2、3 選一位', '點一張履歷，選一位') : '台下用手機投票，或舉手後由操作的人按 1、2、3 記錄'}</div>
         <div class="vote-reveal"></div>
       </div>`);
+      // 點履歷卡＝按 1、2、3
+      panelEl.querySelectorAll('.cv').forEach((el, i) => {
+        el.addEventListener('click', () => SS.input._pressed.add(`Digit${i + 1}`));
+      });
       // 十秒倒數只是視覺效果，不會自動跳走
       const num = panelEl.querySelector('.vote-clock span');
       let left = seconds;
@@ -336,13 +343,15 @@ SS.panels = (function () {
 
   const lobby = {
     show(d, link) {
+      // 觀眾自己看的版本沒有台下投票，不放 QR code
+      const body = SS.live.audience
+        ? `<div class="lobby-text"><p>這是我們普社課的報告</p><p>${SS.tip('用鍵盤或滑鼠操作', '用手指操作')}，自己走一遍「同一條街」</p></div>`
+        : `<div class="lobby-qr">${qrSvg(link)}</div>
+          <div class="lobby-text">${d.lines.map((l) => `<p>${esc(l)}</p>`).join('')}<small>${esc(link)}</small></div>`;
       showPanel('lobby', `<div class="lobby">
         <h1>${esc(d.heading)}</h1>
-        <div class="lobby-row">
-          <div class="lobby-qr">${qrSvg(link)}</div>
-          <div class="lobby-text">${d.lines.map((l) => `<p>${esc(l)}</p>`).join('')}<small>${esc(link)}</small></div>
-        </div>
-        <div class="th-hint">按空白鍵開始</div>
+        <div class="lobby-row">${body}</div>
+        <div class="th-hint">${SS.tip('按空白鍵開始', '點一下開始')}</div>
       </div>`);
     },
   };
@@ -350,6 +359,7 @@ SS.panels = (function () {
   // 上台中途按 Q 叫出 QR code
   const qr = {
     toggle(link) {
+      if (SS.live.audience) return SS.ui.toast('這個版本沒有連到台下投票');
       const on = !qrEl.classList.contains('show');
       qrEl.innerHTML = on ? `<div class="qr-box">${qrSvg(link)}<p>掃描加入台下互動</p><small>${esc(link)}</small></div>` : '';
       qrEl.classList.toggle('show', on);

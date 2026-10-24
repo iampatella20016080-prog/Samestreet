@@ -5,6 +5,10 @@
 ## 怎麼開
 雙擊 `game/index.html`，用 Chrome 開啟（要有網路：Three.js、字型、QR code、手機互動都從網路載入）。F 鍵全螢幕；WASD／方向鍵移動，Shift 快走，滑鼠拖曳轉視角。
 
+**上台**：雙擊 `game/index.html`；或用網址 https://iampatella20016080-prog.github.io/Samestreet/game/?host （**一定要加 `?host`**，不然不會連到台下投票）。
+
+**觀眾自己看**：https://iampatella20016080-prog.github.io/Samestreet/game/ ，電腦、手機（要橫拿）、iPad 都可以。這個版本的投票只存在自己的瀏覽器裡，不會干擾上台那一場。手機和 iPad 用左下搖桿移動、點一下繼續，左上角 ☰ 是段落選單。
+
 ## 上台用的按鍵
 | 按鍵 | 功能 |
 |---|---|

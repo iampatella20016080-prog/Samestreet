@@ -174,7 +174,7 @@ SS.mech = {
       let releasedFor = 0;
       let idle = 0;
       let t = 0;
-      ui.hold.show(hold.prompt);
+      ui.hold.show(SS.tip(hold.prompt, hold.prompt.replace('空白鍵', '圓圈')));
       ui.hold.urgent(fails >= 2);
       ui.hud.setMask(1);
       ui.hud.setFace('smile');
