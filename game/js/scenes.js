@@ -205,8 +205,10 @@ SS.director = (function () {
     SS.ui.hud.setFace('smile');
   }
 
-  function go(i) {
+  // jump：目錄選單的「結尾：報告五項」「結尾：製作名單」用，讓結尾那一段直接從那一頁開始
+  function go(i, jump) {
     if (!list.length) return;
+    SS.state.jump = jump || null;
     i = SS.util.clamp(i, 0, list.length - 1);
     cancel();
     SS.ui.reset();
@@ -1203,10 +1205,14 @@ SS.scenes = (function () {
       },
       async run(ctx) {
         const d = ctx.data;
-        for (const v of d.views) {
-          SS.panels.views.show(v, v.showVote ? voteStat() : '');
-          SS.sfx.play('pop');
-          await ctx.key();
+        const jump = SS.state.jump;
+        SS.state.jump = null;
+        if (!jump) {
+          for (const v of d.views) {
+            SS.panels.views.show(v, v.showVote ? voteStat() : '');
+            SS.sfx.play('pop');
+            await ctx.key();
+          }
         }
         SS.panels.hidePanel();
         // 最後畫面：同一條坡道，雅婷和 Siti 一人握一邊把手，一起推阿公往上走
@@ -1237,15 +1243,16 @@ SS.scenes = (function () {
             SS.ui.hud.setCounts(n, SS.state.gaikao, 'name');
           }
         });
-        await ctx.wait(1.2);
-        // 台下叫完名字，按空白鍵：先翻五頁報告對照，再出標題和製作名單
-        await ctx.key();
-        for (const r of d.recap) {
-          SS.panels.views.show(r, '');
+        // 台下叫完名字，按空白鍵：標題加上濃縮的報告五項；再按一下才換成製作名單
+        if (!jump) {
+          await ctx.wait(1.2);
+          await ctx.key();
+        }
+        if (jump !== 'credits') {
+          SS.ui.title(d.heading, null, null, d.recap);
           SS.sfx.play('pop');
           await ctx.key();
         }
-        SS.panels.hidePanel();
         SS.ui.title(d.heading, null, d.credits);
         await ctx.key();
       },

@@ -22,7 +22,7 @@ SS.presenter = {
         return;
       }
       this.closeMenu();
-      SS.director.go(Number(item.dataset.i));
+      SS.director.go(Number(item.dataset.i), item.dataset.jump || null);
     });
     // 觸控裝置的按鈕列；全螢幕要在 click 裡呼叫，瀏覽器才准
     this.menuEl.addEventListener('click', (e) => {
@@ -53,9 +53,9 @@ SS.presenter = {
       if (take('ArrowDown')) this.moveMenu(1);
       if (take('ArrowUp')) this.moveMenu(-1);
       if (take('Enter') || take('Space')) {
-        const i = this.menuSel;
+        const li = this.menuEl.querySelectorAll('li')[this.menuSel];
         this.closeMenu();
-        SS.director.go(i);
+        if (li) SS.director.go(Number(li.dataset.i), li.dataset.jump || null);
       }
       if (take('Escape') || take('KeyM')) this.closeMenu();
       // 選單開著時，其他按鍵都不往下傳
@@ -114,12 +114,17 @@ SS.presenter = {
     this.menuOpen = true;
     this.menuSel = SS.director.index;
     const list = SS.director.list;
-    this.menuEl.innerHTML = `<div class="menu-box"><h2>段落選單</h2>${SS.touch ? this.touchBar() : ''}<ol>${list
+    // 結尾那一段裡的兩頁，也能直接跳過去
+    const end = list.findIndex((s) => s.id === 'ending_views');
+    const extra = end < 0 ? '' : [['recap', '結尾：報告五項（標題頁）'], ['credits', '結尾：製作名單']]
+      .map(([k, t]) => `<li data-i="${end}" data-jump="${k}"><b>↳</b><span>${t}</span><em></em></li>`)
+      .join('');
+    this.menuEl.innerHTML = `<div class="menu-box"><h2>目錄</h2>${SS.touch ? this.touchBar() : ''}<ol>${list
       .map((s, i) => {
         const sec = (SS.DATA.scenes[s.id] || {}).targetSec;
         return `<li data-i="${i}"><b>${i}</b><span>${this.title(i)}</span><em>${sec ? this.fmt(sec) : ''}</em></li>`;
       })
-      .join('')}</ol><p>${SS.tip('↑↓ 選擇　Enter 跳過去　M 關閉', '點段落跳過去　點外面關閉')}</p></div>`;
+      .join('')}${extra}</ol><p>${SS.tip('↑↓ 選擇　Enter 跳過去　M 關閉', '點段落跳過去　點外面關閉')}</p></div>`;
     this.menuEl.classList.add('show');
     this.moveMenu(0);
   },
@@ -136,11 +141,11 @@ SS.presenter = {
   },
 
   moveMenu(d) {
-    const n = SS.director.list.length;
+    const n = this.menuEl.querySelectorAll('li').length;
     this.menuSel = (this.menuSel + d + n) % n;
     this.menuEl.querySelectorAll('li').forEach((li, i) => {
       li.classList.toggle('sel', i === this.menuSel);
-      li.classList.toggle('now', i === SS.director.index);
+      li.classList.toggle('now', i === SS.director.index && !li.dataset.jump);
     });
     const sel = this.menuEl.querySelector('li.sel');
     if (sel) sel.scrollIntoView({ block: 'nearest' });

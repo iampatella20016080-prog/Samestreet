@@ -250,7 +250,7 @@ SS.ui = {
     this.tintEl.className = kind ? `show ${kind}` : '';
   },
 
-  title(heading, sub, credits) {
+  title(heading, sub, credits, recap) {
     const el = this.titleEl;
     if (!heading) {
       el.className = '';
@@ -258,8 +258,9 @@ SS.ui = {
       return;
     }
     const list = credits ? `<dl class="credits">${credits.map(([role, names]) => `<dt>${role}</dt><dd>${names}</dd>`).join('')}</dl>` : '';
-    el.innerHTML = `<h1>${heading}</h1>${sub ? `<p>${sub}</p>` : ''}${list}`;
-    el.className = 'show';
+    const sum = recap ? `<dl class="credits recap">${recap.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>` : '';
+    el.innerHTML = `<h1>${heading}</h1>${sub ? `<p>${sub}</p>` : ''}${sum}${list}`;
+    el.className = (recap || credits) ? 'show with-list' : 'show';
   },
 
   // 天橋前的大叉

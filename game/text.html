@@ -80,7 +80,7 @@ th { font-size: .8rem; color: var(--muted); white-space: nowrap; }
     shout: '樓下喊', greeting: '打招呼', uncle: '下棋阿伯', voices: '三位看護的話', placeholderNote: '暫用台詞時畫面標的字',
     clipping: '公布欄上的舊剪報', compare: '天橋對照', compareTime: '兩人走同一段路的時間', ghostLabel: '影子頭上的字',
     blocked: '天橋前的大叉', tasks: '家務清單', result: '時間到的結算畫面', chores: '家務小遊戲', counts: '右上角計數',
-    table: '雅婷和 Siti 的對照表', recap: '製作名單前的五頁報告對照', gains: '誰得到好處', costs: '誰付出代價', views: '我們的看法', heading: '大標題',
+    table: '雅婷和 Siti 的對照表', recap: '結尾標題這一頁的報告五項', gains: '誰得到好處', costs: '誰付出代價', views: '我們的看法', heading: '大標題',
     subheading: '副標題', credits: '製作名單', typed: '雅婷打了又刪掉的字', lines: '台詞', stops: '沿路停下來的台詞',
     areaLabels: '走進這區時左下角的地名', hold: '按住空白鍵', confirm: '按鈕', chats: 'LINE 聊天室', messages: '訊息', name: '名稱',
     cols: '欄位', rows: '列', title: '標題', body: '內文', label: '字', clock: '畫面時間', text: '字', note: '註',
@@ -165,7 +165,7 @@ th { font-size: .8rem; color: var(--muted); white-space: nowrap; }
     let body = '';
     for (const k of Object.keys(s)) {
       if (k === 'views') { body += views(s); continue; }
-      if (k === 'recap') { body += `<div class="grp"><h4>製作名單前的五頁報告對照（按空白鍵翻）</h4>${s.recap.map((v, n) => `<div class="card"><span class="no">${n + 1} / ${s.recap.length}</span><h3>${esc(v.title)}</h3><p style="margin:0">${esc(v.body)}</p></div>`).join('')}</div>`; continue; }
+      if (k === 'recap') { body += `<div class="grp"><h4>結尾標題這一頁的報告五項（再按一下空白鍵才出製作名單）</h4>${table(s.recap)}</div>`; continue; }
       if (k === 'credits') { body += `<div class="grp"><h4>製作名單</h4>${table(s.credits)}</div>`; continue; }
       body += render(s[k], k);
     }
