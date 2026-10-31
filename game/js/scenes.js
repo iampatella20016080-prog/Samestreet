@@ -1238,7 +1238,15 @@ SS.scenes = (function () {
           }
         });
         await ctx.wait(1.2);
-        SS.ui.title(d.heading);
+        // 台下叫完名字，按空白鍵：先翻五頁報告對照，再出標題和製作名單
+        await ctx.key();
+        for (const r of d.recap) {
+          SS.panels.views.show(r, '');
+          SS.sfx.play('pop');
+          await ctx.key();
+        }
+        SS.panels.hidePanel();
+        SS.ui.title(d.heading, null, d.credits);
         await ctx.key();
       },
       // 三個人沿坡道慢慢往上（u 越小越靠近阿公家）

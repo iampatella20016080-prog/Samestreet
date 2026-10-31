@@ -144,11 +144,14 @@ SS.ui = {
     const el = this.choresEl;
     this.actEl.classList.toggle('show', !!st);
     if (!st) {
+      this.choresAt = 0;
       el.className = '';
       el.innerHTML = '';
       return;
     }
-    el.className = `show${st.left <= 5 ? ' hurry' : ''}`;
+    if (!this.choresAt) this.choresAt = performance.now();
+    const compact = SS.touch && performance.now() - this.choresAt > 6000;
+    el.className = `show${st.left <= 5 ? ' hurry' : ''}${compact ? ' compact' : ''}`;
     el.innerHTML = `<b>剩 ${Math.max(0, Math.ceil(st.left))} 秒</b><span>做完 ${st.done} 件　還有 ${st.remaining} 件</span>
       <small>${SS.tip('WASD 走過去，按住 E 做家務；阿公叫人時，要先跑回阿公旁邊按住 E', '用搖桿走過去，按住右下角按鈕做家務；阿公叫人時，要先跑回阿公旁邊按住')}</small>`;
   },
@@ -247,14 +250,15 @@ SS.ui = {
     this.tintEl.className = kind ? `show ${kind}` : '';
   },
 
-  title(heading, sub) {
+  title(heading, sub, credits) {
     const el = this.titleEl;
     if (!heading) {
       el.className = '';
       el.innerHTML = '';
       return;
     }
-    el.innerHTML = `<h1>${heading}</h1>${sub ? `<p>${sub}</p>` : ''}`;
+    const list = credits ? `<dl class="credits">${credits.map(([role, names]) => `<dt>${role}</dt><dd>${names}</dd>`).join('')}</dl>` : '';
+    el.innerHTML = `<h1>${heading}</h1>${sub ? `<p>${sub}</p>` : ''}${list}`;
     el.className = 'show';
   },
 

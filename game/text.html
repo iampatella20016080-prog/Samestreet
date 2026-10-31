@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>同一條街 全部文字</title>
+<!-- 這一頁直接讀 js/data.js，把遊戲裡所有台詞、字幕、理論卡、帳本、看法照順序列出來。
+     改了 data.js 之後重新整理就會更新，不用另外維護。雙擊就能開，不用網路。 -->
+<style>
+:root {
+  --bg: #f1f4f2; --surface: #fff; --fg: #1c2420; --muted: #5a6761; --line: #d3dcd7;
+  --accent: #2c5a46; --mint: #7ed9b5; --mint-soft: #dcf2e8; --red: #b8352b; --gold-soft: #f8edc6; --gold: #7d600f; --ink: #1a1a1a;
+  --sans: "Noto Sans TC", "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #121715; --surface: #1b2320; --fg: #e5ebe7; --muted: #9caaa3; --line: #2f3a35; --accent: #8fd6b6; --mint: #5fbf98; --mint-soft: #1d3a2d; --red: #ff8274; --gold-soft: #393014; --gold: #e8c65e; --ink: #e5ebe7; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.8 var(--sans); padding: 0 max(16px, env(safe-area-inset-left)); }
+.wrap { max-width: 860px; margin: 0 auto; padding: 36px 0 90px; display: grid; gap: 40px; }
+h1 { margin: 0; font-size: clamp(2rem, 6vw, 2.8rem); letter-spacing: .06em; font-weight: 900; }
+h1 small { display: block; font-size: .4em; letter-spacing: .1em; color: var(--accent); margin-top: 4px; }
+.lead { color: var(--muted); max-width: 40em; margin: 8px 0 0; }
+nav { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .9rem; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 12px 16px; }
+nav a { color: var(--fg); text-decoration: none; }
+nav a:hover { color: var(--accent); }
+nav .n { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 4px; }
+section { display: grid; gap: 12px; scroll-margin-top: 16px; border-top: 1px solid var(--line); padding-top: 26px; }
+section > h2 { margin: 0; font-size: 1.4rem; font-weight: 900; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+section > h2 .sec { font-size: .78rem; color: var(--accent); background: var(--mint-soft); padding: 1px 9px; border-radius: 6px; font-weight: 700; }
+.grp { display: grid; gap: 8px; border-left: 3px solid var(--line); padding-left: 14px; }
+.grp > h4 { margin: 8px 0 0; font-size: .82rem; color: var(--muted); letter-spacing: .08em; font-weight: 700; }
+.plain { margin: 0; }
+.plain b { display: inline-block; font-size: .78rem; color: var(--muted); background: var(--mint-soft); border-radius: 5px; padding: 0 8px; margin-right: 8px; font-weight: 700; }
+ul.items { margin: 0; padding-left: 1.3em; }
+.line { background: var(--surface); border: 2.5px solid var(--ink); border-radius: 12px; padding: 14px 16px 10px; position: relative; margin-top: 10px; }
+.line .who { position: absolute; top: -12px; left: 12px; background: var(--ink); color: var(--bg); font-size: .76rem; font-weight: 700; padding: 1px 10px; border-radius: 6px; }
+.line .tag { font-size: .74rem; color: var(--muted); margin-left: 6px; font-weight: 400; }
+.line p { margin: 0; }
+.line .sub { color: var(--muted); font-size: .92rem; }
+.line .heard { color: var(--accent); font-size: .9rem; }
+.line .hud, .line .warn { display: inline-block; font-size: .72rem; border-radius: 5px; padding: 0 7px; margin: 4px 6px 0 0; font-weight: 700; }
+.line .hud { background: var(--mint-soft); color: var(--accent); }
+.line .warn { background: var(--gold-soft); color: var(--gold); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; display: grid; gap: 6px; }
+.card h3 { margin: 0; font-size: 1.05rem; }
+.card .no { color: var(--accent); font-size: .8rem; font-weight: 700; letter-spacing: .08em; }
+.card blockquote { margin: 0; padding-left: 12px; border-left: 3px solid var(--mint); }
+.card .src { color: var(--muted); font-size: .85rem; }
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: .93rem; line-height: 1.6; }
+th, td { padding: 8px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: 0; }
+th { font-size: .8rem; color: var(--muted); white-space: nowrap; }
+.note { font-size: .88rem; color: var(--muted); }
+@media print { nav { display: none; } section { break-inside: avoid-page; } body { background: #fff; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>同一條街<small>遊戲裡的全部文字</small></h1>
+    <p class="lead">照遊戲播放的順序，把每一段會出現的台詞、字幕、理論卡、帳本和看法都列出來。這一頁直接讀 <code>js/data.js</code>，改字後重新整理就會更新。大括號 {…} 的地方，遊戲會填進實際算出來的數字。</p>
+  </header>
+  <nav id="toc" aria-label="目錄"></nav>
+  <div id="out" style="display:grid;gap:40px"></div>
+</div>
+<script src="js/data.js"></script>
+<script>
+(function () {
+  const D = SS.DATA, P = D.people, LANG = D.langNames;
+  const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])).replace(/\n/g, '<br>');
+
+  // 資料欄位 → 看得懂的名稱。沒列到的欄位直接顯示欄位名。
+  const LABEL = {
+    place: '地點字幕', board: '黑板上的字', questions: '面試題', ask: '老師問', honest: '選項：真話', mask: '選項：標準答案',
+    reject: '選了真話以後', end: '三題答完', cite: '右下角出處', tv: '電視跑馬燈', tvCite: '跑馬燈旁出處', prompt: '提示字',
+    egg: '旁白', reveal: '選完後亮出來的字', question: '題目', intro: '開場', taken: '選了別人以後', after: '之後', call: '電話／視訊',
+    shout: '樓下喊', greeting: '打招呼', uncle: '下棋阿伯', voices: '三位看護的話', placeholderNote: '暫用台詞時畫面標的字',
+    clipping: '公布欄上的舊剪報', compare: '天橋對照', compareTime: '兩人走同一段路的時間', ghostLabel: '影子頭上的字',
+    blocked: '天橋前的大叉', tasks: '家務清單', result: '時間到的結算畫面', chores: '家務小遊戲', counts: '右上角計數',
+    table: '雅婷和 Siti 的對照表', recap: '製作名單前的五頁報告對照', gains: '誰得到好處', costs: '誰付出代價', views: '我們的看法', heading: '大標題',
+    subheading: '副標題', credits: '製作名單', typed: '雅婷打了又刪掉的字', lines: '台詞', stops: '沿路停下來的台詞',
+    areaLabels: '走進這區時左下角的地名', hold: '按住空白鍵', confirm: '按鈕', chats: 'LINE 聊天室', messages: '訊息', name: '名稱',
+    cols: '欄位', rows: '列', title: '標題', body: '內文', label: '字', clock: '畫面時間', text: '字', note: '註',
+    uphill: '', learned: '',
+  };
+  // 這些欄位是程式用的設定值，不是畫面上的字
+  const SKIP = new Set(['targetSec', 'lang', 'who', 'callsGaikao', 'callsName', 'callsYating', 'live', 'key', 'id', 'kind', 'showVote',
+    'seconds', 'holdSeconds', 'callEvery', 'answerSeconds', 'speed', 'prayerSec', 'countdown', 'guessRow', 'finalNames', 'card', 'at',
+    'placeholder', 'source', 'maskTo', 'sub', 'time', 'title', 'no', 'times', 'ok']);
+
+  const who = (id) => P[id] || id;
+  const lab = (k) => (k in LABEL ? LABEL[k] : P[k] ? P[k] + '（在這裡停下來講話）' : k);
+
+  function line(o) {
+    const tags = [];
+    if (o.lang) tags.push(LANG[o.lang] || o.lang);
+    if (o.note) tags.push(o.note);
+    let h = `<div class="line"><span class="who">${esc(who(o.who))}${tags.length ? `<span class="tag" style="color:inherit;opacity:.8">${esc(tags.join('・'))}</span>` : ''}</span>`;
+    h += `<p>${esc(o.text)}</p>`;
+    if (o.sub) h += `<p class="sub">${esc(o.sub)}</p>`;
+    if (o.maskTo) h += `<p class="heard">Siti 看到的（中文變方塊）：${esc(o.maskTo)}</p>`;
+    if (o.cite) h += `<span class="warn">右下角出處：${esc(o.cite)}</span>`;
+    if (o.callsGaikao) h += `<span class="hud">右上角「叫我外勞」+1</span>`;
+    if (o.callsName) h += `<span class="hud">右上角「叫我名字」+1</span>`;
+    if (o.callsYating) h += `<span class="hud">右上角「叫她雅婷」+1</span>`;
+    if (o.placeholder) h += `<span class="warn">畫面標：${esc(D.scenes.ch2_park.placeholderNote)}</span>`;
+    return h + '</div>';
+  }
+
+  function table(rows) {
+    return `<div class="tbl"><table><tbody>${rows.map((r, i) => `<tr>${r.map((c) => `<${i === 0 ? 'th' : 'td'}>${esc(c)}</${i === 0 ? 'th' : 'td'}>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  }
+
+  function render(v, key) {
+    if (v == null || typeof v === 'number' || typeof v === 'boolean') return '';
+    if (typeof v === 'string') return SKIP.has(key) ? '' : `<p class="plain"><b>${esc(lab(key))}</b>${esc(v)}</p>`;
+    if (Array.isArray(v)) {
+      if (!v.length) return '';
+      if (key === 'areaLabels' && typeof v[0] === 'object') return render(v.map((x) => x.text), key);
+      if (key === 'counts' && typeof v[0] === 'object') return render(v.map((x) => x.label), key);
+      if (v.every((x) => typeof x === 'string')) return `<div class="grp"><h4>${esc(lab(key))}</h4><ul class="items">${v.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>`;
+      if (v.every(Array.isArray)) return `<div class="grp"><h4>${esc(lab(key))}</h4>${table(v)}</div>`;
+      return `<div class="grp"><h4>${esc(lab(key))}</h4>${v.map((x) => render(x, key)).join('')}</div>`;
+    }
+    if (typeof v.text === 'string' && v.who) return line(v);
+    if (key === 'clock') return `<p class="plain"><b>畫面時間</b>${esc(v.time)}${v.note ? '　' + esc(v.note) : ''}</p>`;
+    if (key === 'table') return `<div class="grp"><h4>${esc(lab(key))}</h4>${table([v.cols, ...v.rows])}</div>`;
+    if (key === 'clipping') return `<div class="grp"><h4>${esc(lab(key))}</h4><div class="card"><h3>${esc(v.title)}</h3><p style="margin:0">${esc(v.text)}</p></div></div>`;
+    if (key === 'chores') return `<div class="grp"><h4>${esc(lab(key))}</h4>${render(v.tasks, 'tasks')}${render(v.result, 'result')}</div>`;
+    const inner = Object.keys(v).filter((k) => (!SKIP.has(k) || k === 'text') && !(key === 'chats' && k === 'name')).map((k) => render(v[k], k)).join('');
+    if (!inner) return '';
+    const head = typeof v.name === 'string' && key === 'chats' ? v.name : lab(key);
+    return `<div class="grp"><h4>${esc(head)}</h4>${inner}</div>`;
+  }
+
+  function card(n) {
+    const c = D.cards.find((x) => x.no === n);
+    if (!c) return '';
+    return `<div class="grp"><h4>理論卡 ${c.no}</h4><div class="card"><span class="no">理論卡 ${c.no}</span><h3>${esc(c.title)}</h3>${(c.lead || []).map((l) => `<blockquote>${esc(l)}</blockquote>`).join('')}<p style="margin:0">${esc(c.body)}</p><span class="src">出處：${esc(c.source)}</span></div></div>`;
+  }
+
+  function resumes() {
+    const rows = [['', ...D.resumes.map((r) => `${r.name}（${r.country}）`)]];
+    for (const [k, l] of D.resumeFields) rows.push([l, ...D.resumes.map((r) => r[k])]);
+    return `<div class="grp"><h4>三份履歷</h4>${table(rows)}</div>`;
+  }
+
+  function live() {
+    return Object.values(D.live).map((q) => `<div class="grp"><h4>${esc(({ vote: '履歷投票', train: '訓練中心第一題', wage: '帳本：猜時薪', name: '最後：叫她的名字' })[q.id] || q.id)}　${q.kind === 'tap' ? '（台下按按鈕）' : '（台下選一個）'}</h4><p class="plain"><b>手機上的題目</b>${esc(q.title)}</p><ul class="items">${q.options.map((o) => `<li>${esc(o.label)}</li>`).join('')}</ul></div>`).join('');
+  }
+
+  function views(s) {
+    return `<div class="grp"><h4>我們的看法</h4>${s.views.map((v) => `<div class="card"><h3>${esc(v.title)}</h3><p style="margin:0">${esc(v.body)}</p>${v.showVote ? '<span class="src">這張下面會接上剛剛全班投票的百分比</span>' : ''}</div>`).join('')}</div>`;
+  }
+
+  const sections = [];
+  const toc = [];
+  let i = 0;
+  for (const id of Object.keys(D.scenes)) {
+    const s = D.scenes[id];
+    i++;
+    let body = '';
+    for (const k of Object.keys(s)) {
+      if (k === 'views') { body += views(s); continue; }
+      if (k === 'recap') { body += `<div class="grp"><h4>製作名單前的五頁報告對照（按空白鍵翻）</h4>${s.recap.map((v, n) => `<div class="card"><span class="no">${n + 1} / ${s.recap.length}</span><h3>${esc(v.title)}</h3><p style="margin:0">${esc(v.body)}</p></div>`).join('')}</div>`; continue; }
+      if (k === 'credits') { body += `<div class="grp"><h4>製作名單</h4>${table(s.credits)}</div>`; continue; }
+      body += render(s[k], k);
+    }
+    if (s.card) body += card(s.card);
+    if (id === 'ch1_agency') body += resumes();
+    sections.push(`<section id="${id}"><h2><span class="sec">${i}</span>${esc(s.title)}</h2>${body}</section>`);
+    toc.push(`<a href="#${id}"><span class="n">${i}</span>${esc(s.title.replace(/^第.章之.　/, '').replace(/^結尾　/, ''))}</a>`);
+  }
+
+  sections.push(`<section id="phone"><h2><span class="sec">手機</span>台下手機上的四個題目</h2>${live()}</section>`);
+  toc.push('<a href="#phone"><span class="n">手機</span>台下題目</a>');
+
+  const sg = D.signs;
+  sections.push(`<section id="signs"><h2><span class="sec">街景</span>街上的招牌</h2>
+    <p class="plain"><b>早餐店</b>${esc(sg.breakfast)}</p><p class="plain"><b>仲介</b>${esc(sg.agency)}</p>
+    ${render(sg.agencyPosters, '仲介門口的海報')}${render(sg.shops, '路邊的店')}<p class="plain"><b>廟</b>${esc(sg.temple)}</p>
+    <p class="note">還有幾行字寫在 <code>js/scenes.js</code> 裡，不在 data.js：第二章的地名（阿公家　清晨五點半、坡頂巷、天橋、早餐店、廟口公園、頂樓）、轉場的「◀◀ 倒帶」、新聞跑馬燈上的「新聞快報」，以及家務時阿公叫人的「雅婷——」「Siti——」。</p></section>`);
+  toc.push('<a href="#signs"><span class="n">街景</span>招牌</a>');
+
+  document.getElementById('toc').innerHTML = toc.join('');
+  document.getElementById('out').innerHTML = sections.join('');
+})();
+</script>
+</body>
+</html>
